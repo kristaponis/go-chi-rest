@@ -10,7 +10,7 @@ type Adder interface {
 
 type Post struct {
 	Title string `json:"title"`
-	Text  string `json:"post"`
+	Text  string `json:"text"`
 }
 
 type Repository struct {

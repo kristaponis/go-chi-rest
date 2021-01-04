@@ -6,9 +6,20 @@ import (
 	"net/http"
 )
 
-var feed = posts.New()
+var Feed = posts.New()
 
-func PostsHandler(w http.ResponseWriter, r *http.Request) {
-	items := feed.GetAll()
+func GetPosts(w http.ResponseWriter, r *http.Request) {
+	items := Feed.GetAll()
 	json.NewEncoder(w).Encode(items)
+}
+
+func CreatePost(w http.ResponseWriter, r *http.Request) {
+	rBody := map[string]string{}
+	json.NewDecoder(r.Body).Decode(&rBody)
+	Feed.Add(posts.Post{
+		Title: rBody["title"],
+		Text:  rBody["text"],
+	})
+
+	w.Write([]byte("Good!"))
 }
