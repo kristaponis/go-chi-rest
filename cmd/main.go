@@ -13,19 +13,19 @@ const (
 	PORT = ":8080"
 )
 
-func main() {
-	handlers.Feed.Add(posts.Post{
-		Title: "First post",
-		Text: "This is some nice text",
-	})
+var (
+	feed = posts.New()
+)
 
+func main() {
 	r := chi.NewRouter()
 
-	r.Get("/posts", handlers.GetPosts)
-	r.Post("/posts", handlers.CreatePost)
+	r.Get("/posts", handlers.GetPosts(feed))
+	r.Post("/posts", handlers.CreatePost(feed))
 
 	fmt.Println("Serving application...")
 	if err := http.ListenAndServe(PORT, r); err != nil {
 		log.Fatal(err)
 	}
 }
+

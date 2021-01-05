@@ -3,23 +3,31 @@ package handlers
 import (
 	"encoding/json"
 	"go-chi-rest/posts"
+	"log"
 	"net/http"
 )
 
-var Feed = posts.New()
-
-func GetPosts(w http.ResponseWriter, r *http.Request) {
-	items := Feed.GetAll()
-	json.NewEncoder(w).Encode(items)
+func GetPosts(feed posts.Getter) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		items := feed.GetAll()
+		if err := json.NewEncoder(w).Encode(items); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
-func CreatePost(w http.ResponseWriter, r *http.Request) {
-	rBody := map[string]string{}
-	json.NewDecoder(r.Body).Decode(&rBody)
-	Feed.Add(posts.Post{
-		Title: rBody["title"],
-		Text:  rBody["text"],
-	})
-
-	w.Write([]byte("Good!"))
+func CreatePost(feed posts.Adder) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		rBody := map[string]string{}
+		if err := json.NewDecoder(r.Body).Decode(&rBody); err != nil {
+			log.Fatal(err)
+		}
+		feed.Add(posts.Post{
+			Title: rBody["title"],
+			Text:  rBody["text"],
+		})
+		if _, err := w.Write([]byte("Success!")); err != nil {
+			log.Fatal(err)
+		}
+	}
 }
